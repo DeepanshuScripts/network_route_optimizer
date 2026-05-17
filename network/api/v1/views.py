@@ -324,3 +324,54 @@ class RouteHistoryAPIView( generics.ListAPIView):
             status_code=status.HTTP_200_OK,
         )
 
+
+@extend_schema(
+    tags=["Nodes"],
+    summary="Delete and retrieve network nodes",
+    description=(
+        "API for creating and listing "
+        "network nodes."
+    ),
+)
+class NetworkNodeRetrieveDestroyAPIView(generics.RetrieveDestroyAPIView):
+    queryset = NetworkNode.objects.all()
+    serializer_class = NetworkNodeSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+
+        return success_response(
+            message="Node deleted successfully.",
+            data={},
+            status_code=status.HTTP_200_OK,
+        )
+
+@extend_schema(
+    tags=["Edges"],
+    summary="Delete and retrieve network edges",
+    description=(
+        "API for managing network edges."
+    ),
+) 
+class NetworkEdgeRetrieveDestroyAPIView( generics.RetrieveDestroyAPIView):
+    queryset = (
+        NetworkEdge.objects
+        .select_related(
+            "source_node",
+            "destination_node",
+        )
+    )
+    serializer_class = NetworkEdgeSerializer
+
+    def destroy(self, requests, *args, **kwargs):
+
+        instance = self.get_object()
+
+        self.perform_destroy(instance)
+
+        return success_response(
+            message="Edge deleted successfully.",
+            data={},
+            status_code=status.HTTP_200_OK,
+        )
